@@ -167,6 +167,16 @@ const validateService = [
     .isLength({ max: 200 })
     .withMessage('Each excluded item cannot exceed 200 characters'),
   
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  
+  body('tags.*')
+    .optional()
+    .isLength({ max: 50 })
+    .withMessage('Each tag cannot exceed 50 characters'),
+  
   body('isActive')
     .optional()
     .isBoolean()
