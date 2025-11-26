@@ -12,6 +12,7 @@ const {
   togglePopular,
   updateRating
 } = require('../controllers/serviceController');
+const { bulkUploadServices } = require('../controllers/bulkUploadController');
 const { protect, adminOnly, optionalAuth } = require('../middleware/auth');
 const { validateService, validateReview } = require('../middleware/validation');
 
@@ -24,6 +25,7 @@ router.get('/:id', optionalAuth, getService);
 
 // Protected routes (admin only)
 router.post('/', protect, adminOnly, validateService, createService);
+router.post('/bulk', protect, adminOnly, bulkUploadServices);
 router.put('/:id', protect, adminOnly, validateService, updateService);
 router.delete('/:id', protect, adminOnly, deleteService);
 router.patch('/:id/popular', protect, adminOnly, togglePopular);

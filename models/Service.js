@@ -63,22 +63,20 @@ const serviceSchema = new mongoose.Schema({
   },
   pujaLanguage: {
     type: String,
-    required: [true, 'Language is required'],
-    enum: ['Hindi', 'English', 'Sanskrit', 'Tamil', 'Telugu', 'Marathi', 'Gujarati', 'Bengali', 'Kannada', 'Malayalam', 'Punjabi']
+    required: [true, 'Language is required']
   },
   category: {
     type: String,
-    required: [true, 'Category is required'],
-    enum: ['Ganesh Pooja', 'Satyanarayan Katha', 'Laxmi Pooja', 'Rudra Abhishek', 'Navagraha Shanti', 'Vastu Shanti', 'Griha Pravesh', 'Marriage Ceremony', 'Naming Ceremony', 'Last Rites', 'Other']
+    required: [true, 'Category is required']
   },
   difficulty: {
     type: String,
-    enum: ['Simple', 'Moderate', 'Complex'],
-    default: 'Simple'
+    enum: ['Easy', 'Medium', 'Hard'],
+    default: 'Easy'
   },
   benefits: [{
     type: String,
-    maxlength: [200, 'Benefit cannot exceed 200 characters']
+    maxlength: [500, 'Benefit cannot exceed 500 characters']
   }],
   panditDetails: {
     type: String,
@@ -86,11 +84,11 @@ const serviceSchema = new mongoose.Schema({
   },
   materials: [{
     type: String,
-    maxlength: [100, 'Material cannot exceed 100 characters']
+    maxlength: [200, 'Material cannot exceed 200 characters']
   }],
   procedure: [{
     type: String,
-    maxlength: [300, 'Procedure step cannot exceed 300 characters']
+    maxlength: [500, 'Procedure step cannot exceed 500 characters']
   }],
   included: [{
     type: String,
@@ -144,7 +142,7 @@ const serviceSchema = new mongoose.Schema({
 // Index for search functionality
 serviceSchema.index({ title: 'text', description: 'text', category: 'text', tags: 'text' });
 
-serviceSchema.pre('validate', function(next) {
+serviceSchema.pre('validate', function (next) {
   if (!this.slug && this.title) {
     this.slug = generateSlug(this.title);
   }
@@ -157,7 +155,7 @@ serviceSchema.pre('validate', function(next) {
 });
 
 // Ensure slug uniqueness by appending counter if needed
-serviceSchema.pre('save', async function(next) {
+serviceSchema.pre('save', async function (next) {
   if (!this.isModified('slug')) {
     return next();
   }
@@ -175,29 +173,29 @@ serviceSchema.pre('save', async function(next) {
 });
 
 // Update booking count when booking is created
-serviceSchema.statics.incrementBookingCount = async function(serviceId) {
+serviceSchema.statics.incrementBookingCount = async function (serviceId) {
   return await this.findByIdAndUpdate(serviceId, { $inc: { bookingCount: 1 } });
 };
 
 // Get booking count for a service
-serviceSchema.statics.getBookingCount = async function(serviceId) {
+serviceSchema.statics.getBookingCount = async function (serviceId) {
   const service = await this.findById(serviceId, { bookingCount: 1 });
   return service?.bookingCount ?? 0;
 };
 
 // Update rating
-serviceSchema.statics.updateRating = async function(serviceId) {
+serviceSchema.statics.updateRating = async function (serviceId) {
   const Booking = mongoose.model('Booking');
-  const bookings = await Booking.find({ 
-    service: serviceId, 
+  const bookings = await Booking.find({
+    service: serviceId,
     status: 'completed',
     rating: { $exists: true }
   });
-  
+
   if (bookings.length > 0) {
     const totalRating = bookings.reduce((sum, booking) => sum + booking.rating, 0);
     const avgRating = totalRating / bookings.length;
-    
+
     return await this.findByIdAndUpdate(serviceId, {
       rating: {
         average: avgRating,
