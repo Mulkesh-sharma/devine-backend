@@ -33,13 +33,11 @@ const validateUserRegistration = [
 
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .withMessage('Password must be at least 6 characters long'),
 
   body('phone')
-    .matches(/^[6-9]\d{9}$/)
-    .withMessage('Please enter a valid 10-digit phone number starting with 6-9'),
+    .matches(/^\d{10}$/)
+    .withMessage('Please enter a valid 10-digit phone number'),
 
   handleValidationErrors
 ];
