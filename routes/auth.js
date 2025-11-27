@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {
   register,
+  verifyEmail,
+  resendOtp,
   login,
   getMe,
   updateProfile,
@@ -16,6 +18,8 @@ const {
 } = require('../middleware/validation');
 
 router.post('/register', validateUserRegistration, register);
+router.post('/verify', verifyEmail);
+router.post('/resend', resendOtp);
 router.post('/login', validateUserLogin, login);
 router.post('/create-admin', validateUserRegistration, createAdmin);
 
